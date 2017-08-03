@@ -11,17 +11,34 @@ import java.util.*;
 public class NameRepo {
     public static final int SIGN_IN = 0;
     public static final int SIGN_OUT = 1;
-    private static final String NAME_FILE = "names.csv";
-    private static final String DATE_FILE = "dates.csv";
+    private static final String DATE_FILE = "data/dates.csv";
+    private static String dataFile;
     private Map<String, List<Long>> studentToTimes;
 
     private static NameRepo instance;
 
     static {
+        loadSession(SessionManager.getSession());
+    }
+
+    /** Prevent instantiation of NameRepo outside this class */
+    private NameRepo() {}
+
+    /** @return the singleton instance of namerepo */
+    public static NameRepo getInstance() {
+        return instance;
+    }
+
+    /**
+     * Loads the specified session in memory, throws an exception if invalid session
+     * @param session the session to load
+     */
+    public static void loadSession(SessionManager.Session session) {
         instance = new NameRepo();
         instance.studentToTimes = new HashMap<>();
         try {
-            BufferedReader reader = new BufferedReader( new FileReader(NAME_FILE));
+            dataFile = "data/" + session.year + session.season.toString() + ".csv";
+            BufferedReader reader = new BufferedReader(new FileReader(dataFile));
             String line;
             String raw[];
             while ((line = reader.readLine()) != null) {
@@ -36,14 +53,6 @@ public class NameRepo {
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
-
-    /** Prevent instantiation of NameRepo outside this class */
-    private NameRepo() {}
-
-    /** @return the singleton instance of namerepo */
-    public static NameRepo getInstance() {
-        return instance;
     }
 
     /**
@@ -65,6 +74,10 @@ public class NameRepo {
         }
     }
 
+    /**
+     * Remove student from the repo
+     * @param name the student identifier
+     */
     public void removeName(String name){
         if(studentToTimes.containsKey(name)){
             studentToTimes.remove(name);
@@ -76,7 +89,7 @@ public class NameRepo {
      * rewrites the name file
      */
     public void rewrite(){
-        try (Writer rewriter = new PrintWriter(new FileOutputStream(NAME_FILE, false))) {
+        try (Writer rewriter = new PrintWriter(new FileOutputStream(dataFile, false))) {
             // Add time to the list for the student
             for (String student : studentToTimes.keySet()) {
                 rewriter.write(student + ",");

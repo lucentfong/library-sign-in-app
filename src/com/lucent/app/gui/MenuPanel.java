@@ -2,6 +2,7 @@ package com.lucent.app.gui;
 
 import com.lucent.app.LibraryUtil;
 import com.lucent.app.NameRepo;
+import com.lucent.app.SessionManager;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -25,11 +26,11 @@ public class MenuPanel extends JPanel implements ActionListener {
     public MenuPanel() {
         this.repo = NameRepo.getInstance();
 
-        titleImage = new JLabel(new ImageIcon("Library Title.png"),JLabel.LEFT);
+        titleImage = new JLabel(new ImageIcon("img/Library Title.png"),JLabel.LEFT);
         signInButton = new JButton("Sign In");
         signOutButton = new JButton("Sign Out");
         adminButton = new JButton("Admin");
-        libraryImage = new JLabel(new ImageIcon("library.jpg"),JLabel.CENTER);
+        libraryImage = new JLabel(new ImageIcon("img/library.jpg"),JLabel.CENTER);
 
         adminButton.addActionListener(this);
         signInButton.addActionListener(this);
@@ -40,6 +41,8 @@ public class MenuPanel extends JPanel implements ActionListener {
         this.add(signOutButton);
         this.add(adminButton);
         this.add(libraryImage);
+
+        this.add(new JLabel("Current Session: " + SessionManager.getSession(), JLabel.CENTER));
     }
 
     @Override

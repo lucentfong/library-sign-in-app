@@ -1,6 +1,7 @@
 .idea/*
 out/*
 src/META-INF/
+data/
 # Windows image file caches
 Thumbs.db
 ehthumbs.db

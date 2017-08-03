@@ -16,7 +16,7 @@ import java.io.IOException;
  */
 public class AdminPanel extends JPanel implements ActionListener {
     public static final int PADDING = 20;
-    private static final String OUT_FILE = "print.csv";
+    private static final String OUT_FILE = "data/print.csv";
 
     private StudentTimeTableModel model;
 
@@ -24,6 +24,7 @@ public class AdminPanel extends JPanel implements ActionListener {
     private JButton listButton;
     private JButton addButton;
     private JButton removeButton;
+    private JButton changesessionButton;
 
     private NameRepo repo;
 
@@ -43,17 +44,20 @@ public class AdminPanel extends JPanel implements ActionListener {
         listButton = new JButton("List Hours");
         addButton = new JButton ("Add Student");
         removeButton = new JButton("Remove Student");
+        changesessionButton = new JButton("Add/Change Sessions");
 
         returnButton.addActionListener(this);
         listButton.addActionListener(this);
         addButton.addActionListener(this);
         removeButton.addActionListener(this);
+        changesessionButton.addActionListener(this);
 
         JPanel buttonPanel = new JPanel();
         buttonPanel.add(returnButton);
         buttonPanel.add(listButton);
         buttonPanel.add(addButton);
         buttonPanel.add(removeButton);
+        buttonPanel.add(changesessionButton);
 
         add(label);
         add(new JScrollPane(dateTable));
@@ -71,6 +75,8 @@ public class AdminPanel extends JPanel implements ActionListener {
             removeStudent();
         } else if (src == returnButton) {
             SignInWindow.showPanel(SignInWindow.MENU_LAYOUT);
+        } else if (src == changesessionButton) {
+            // TODO implement input dialog to change session
         }
     }
 
