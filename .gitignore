@@ -1,4 +1,5 @@
-.idea/**
+.idea/*
+out/*
 
 # Windows image file caches
 Thumbs.db
