@@ -27,7 +27,7 @@ public class SessionManager {
      */
     public static class Session implements Comparable<Session> {
 
-        enum Season { // Do not change the order or compareTo will break!
+        public enum Season { // Do not change the order or compareTo will break!
             SPRING, SUMMER, FALL, WINTER;
 
             static public Season of ( Month month ) {
@@ -67,6 +67,12 @@ public class SessionManager {
         }
 
         @Override
+        public boolean equals(Object o) {
+            return o instanceof Session &&
+                    (o == this || ((Session) o).year == this.year && ((Session) o).season == this.season);
+        }
+
+        @Override
         public String toString() {
             String s = this.season.toString().toLowerCase();
             return s.substring(0,1).toUpperCase() + s.substring(1) + ", " + this.year;
@@ -77,7 +83,6 @@ public class SessionManager {
     public static Session getSession() {
         if (session == null) {
             session = getLatestSession();
-            System.out.println(session);
             if (session == null) {
                 session = determineCurrentSession();
                 createSession(session);
@@ -91,8 +96,8 @@ public class SessionManager {
      * @param session the session to change to
      */
     public static void changeSession(Session session) {
-        List<Session> sessions = getSessionsFromFile();
-        if (sessions == null || sessions.isEmpty())
+        List<Session> sessions = getAvailableSessions();
+        if (sessions == null || !sessions.contains(session))
             createSession(session);
 
         SessionManager.session = session;
@@ -103,7 +108,7 @@ public class SessionManager {
      * @return the latest session or null if no files
      */
     private static Session getLatestSession() {
-        List<Session> sessions = getSessionsFromFile();
+        List<Session> sessions = getAvailableSessions();
         if (!sessions.isEmpty()) {
             Collections.sort(sessions);
             return sessions.get(sessions.size() - 1); // latest session
@@ -138,7 +143,7 @@ public class SessionManager {
     }
 
     /** @return the sessions that there is data for based on files in data/ */
-    private static List<Session> getSessionsFromFile() {
+    public static List<Session> getAvailableSessions() {
         File[] files = new File("data/").listFiles();
         List<Session> sessions = null;
         if (files != null) {
@@ -147,6 +152,8 @@ public class SessionManager {
                     .map(SessionManager::fileToSession)
                     .filter(Objects::nonNull)
                     .collect(Collectors.toList());
+            sessions.sort(Collections.reverseOrder());
+            for (Session s : sessions) System.out.println(s);
         }
         return sessions;
     }

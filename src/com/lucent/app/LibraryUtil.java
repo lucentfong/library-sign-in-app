@@ -6,7 +6,7 @@ import java.util.Calendar;
 import java.util.List;
 
 /**
- * Created by Lucent on 7/29/2017.
+ * @author Lucent Fong
  */
 public class LibraryUtil {
     private static final int MILLIS_IN_SEC = 1000;
@@ -28,7 +28,7 @@ public class LibraryUtil {
     }
 
     /**
-     * ???
+     * Converts a list of sign in/out times to date
      * @param times
      * @return
      */

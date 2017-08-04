@@ -4,7 +4,7 @@ import java.io.*;
 import java.util.List;
 
 /**
- * Created by Lucent on 7/28/2017.
+ * @author Lucent Fong (fongl@mcvts.net)
  */
 public class DataWriter implements Closeable {
     private Writer writer;
@@ -25,7 +25,7 @@ public class DataWriter implements Closeable {
     public void writeAll(NameRepo repo) throws IOException {
         writer.write(",,,Monroe Library Hours\n\n,,,ID,Hours\n");
         for (String name : repo.getStudents()) {
-            writeStudent(name, repo.searchName(name));
+            writeStudent(name, repo.getStudentTimes(name));
         }
     }
 

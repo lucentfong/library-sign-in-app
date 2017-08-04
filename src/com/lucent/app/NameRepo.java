@@ -18,7 +18,9 @@ public class NameRepo {
     private static NameRepo instance;
 
     static {
-        loadSession(SessionManager.getSession());
+        instance = new NameRepo();
+        instance.studentToTimes = new HashMap<>();
+        instance.loadSession(SessionManager.getSession());
     }
 
     /** Prevent instantiation of NameRepo outside this class */
@@ -33,9 +35,8 @@ public class NameRepo {
      * Loads the specified session in memory, throws an exception if invalid session
      * @param session the session to load
      */
-    public static void loadSession(SessionManager.Session session) {
-        instance = new NameRepo();
-        instance.studentToTimes = new HashMap<>();
+    public void loadSession(SessionManager.Session session) {
+        instance.studentToTimes.clear();
         try {
             dataFile = "data/" + session.year + session.season.toString() + ".csv";
             BufferedReader reader = new BufferedReader(new FileReader(dataFile));
@@ -99,10 +100,10 @@ public class NameRepo {
                 rewriter.write("\n");
             }
         } catch (FileNotFoundException e) {
-            System.out.print("ERROR: File not found");
+            System.err.println("ERROR: File not found");
             e.printStackTrace();
         } catch (IOException e) {
-            System.out.println("ERROR: Error reading from file");
+            System.err.println("ERROR: Error reading from file");
             e.printStackTrace();
         }
         writeDates();
@@ -136,7 +137,7 @@ public class NameRepo {
      * @param name the student name
      * @return list of times
      */
-    public List<Long> searchName(String name){
+    public List<Long> getStudentTimes(String name){
         return studentToTimes.get(name);
     }
 

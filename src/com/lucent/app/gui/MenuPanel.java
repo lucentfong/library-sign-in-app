@@ -2,15 +2,14 @@ package com.lucent.app.gui;
 
 import com.lucent.app.LibraryUtil;
 import com.lucent.app.NameRepo;
-import com.lucent.app.SessionManager;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.*;
+import java.util.Date;
 
 /**
- * Created by Lucent on 7/2/2017.
+ * @author Lucent Fong (Fongl@mcvts.net)
  */
 public class MenuPanel extends JPanel implements ActionListener {
 
@@ -41,8 +40,6 @@ public class MenuPanel extends JPanel implements ActionListener {
         this.add(signOutButton);
         this.add(adminButton);
         this.add(libraryImage);
-
-        this.add(new JLabel("Current Session: " + SessionManager.getSession(), JLabel.CENTER));
     }
 
     @Override

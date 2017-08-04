@@ -6,7 +6,7 @@ import java.awt.*;
 import static javax.swing.SwingUtilities.invokeLater;
 
 /**
- * Created by Lucent on 7/2/2017.
+ * @author Lucent Fong (fongl@mcvts.net)
  */
 public class SignInWindow {
     public static final String MENU_LAYOUT = "menu-layout";
@@ -40,7 +40,6 @@ public class SignInWindow {
 
         frame.getContentPane().add(cardLayoutPanel, BorderLayout.CENTER);
         frame.setPreferredSize(new Dimension(800, 600));
-
 
         // Display the window.
         frame.pack();
