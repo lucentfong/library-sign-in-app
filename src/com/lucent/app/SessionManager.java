@@ -19,6 +19,7 @@ public class SessionManager {
 
     // file name format: YYYYSEASON.csv, e.g. 2018SPRING.csv
     private static final Pattern NAME_PATTERN = Pattern.compile("[0-9]+[A-Z]+\\.csv");
+    private static final String DIR = "data/";
 
     private SessionManager() {}
 
@@ -121,7 +122,7 @@ public class SessionManager {
      * @param session the session to create
      */
     private static void createSession(Session session) {
-        File f = new File("data/" + session.year + session.season + ".csv");
+        File f = new File(DIR + session.year + session.season + ".csv");
         try {
             f.createNewFile();
         } catch (IOException e) {
@@ -144,7 +145,8 @@ public class SessionManager {
 
     /** @return the sessions that there is data for based on files in data/ */
     public static List<Session> getAvailableSessions() {
-        File[] files = new File("data/").listFiles();
+        checkDir();
+        File[] files = new File(DIR).listFiles();
         List<Session> sessions = null;
         if (files != null) {
             // Scour the directory for files and determine the sessions for each file.
@@ -153,7 +155,6 @@ public class SessionManager {
                     .filter(Objects::nonNull)
                     .collect(Collectors.toList());
             sessions.sort(Collections.reverseOrder());
-            for (Session s : sessions) System.out.println(s);
         }
         return sessions;
     }
@@ -173,6 +174,16 @@ public class SessionManager {
             sess = new Session(season, year);
         }
         return sess;
+    }
+
+    /**
+     * Checks to make sure the directory exists, otherwise creates it
+     */
+    private static void checkDir() {
+        File directory = new File(DIR);
+        if (! directory.exists()){
+            directory.mkdir();
+        }
     }
 
 }

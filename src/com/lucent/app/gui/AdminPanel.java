@@ -40,7 +40,10 @@ public class AdminPanel extends JPanel implements ActionListener, ListSelectionL
     private JButton addButton;
     private JButton removeButton;
     private JButton newSessionButton;
+    private JButton changeSessionButton;
     private JButton refreshButton;
+
+    private JLabel sessionLabel;
 
     private NameRepo repo;
 
@@ -50,11 +53,14 @@ public class AdminPanel extends JPanel implements ActionListener, ListSelectionL
         setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
         setBorder(new EmptyBorder(PADDING, PADDING, PADDING, PADDING));
 
+        sessionLabel = new JLabel();
+
         addComponentListener(this);
 
         add(new JLabel("Admin"));
         add(createTablesPanel());
         add(createButtonPanel());
+        add(sessionLabel);
     }
 
     private JPanel createTablesPanel() {
@@ -93,6 +99,7 @@ public class AdminPanel extends JPanel implements ActionListener, ListSelectionL
         addButton = new JButton ("Add Student");
         removeButton = new JButton("Remove Student");
         newSessionButton = new JButton("New Session");
+        changeSessionButton = new JButton("Change Session");
         refreshButton = new JButton("Refresh");
 
         returnButton.addActionListener(this);
@@ -100,6 +107,7 @@ public class AdminPanel extends JPanel implements ActionListener, ListSelectionL
         addButton.addActionListener(this);
         removeButton.addActionListener(this);
         newSessionButton.addActionListener(this);
+        changeSessionButton.addActionListener(this);
         refreshButton.addActionListener(this);
 
         JPanel buttonPanel = new JPanel();
@@ -108,6 +116,7 @@ public class AdminPanel extends JPanel implements ActionListener, ListSelectionL
         buttonPanel.add(addButton);
         buttonPanel.add(removeButton);
         buttonPanel.add(newSessionButton);
+        buttonPanel.add(changeSessionButton);
         buttonPanel.add(refreshButton);
 
         return buttonPanel;
@@ -125,9 +134,9 @@ public class AdminPanel extends JPanel implements ActionListener, ListSelectionL
     }
 
     private void updateTimeList() {
+        timeModel.clear();
         String name = studentList.getSelectedValue();
         if (name != null) {
-            timeModel.clear();
             repo.getStudentTimes(name).forEach(time -> timeModel.addElement(DATE_FORMATTER.format(new Date(time))));
         }
     }
@@ -151,8 +160,29 @@ public class AdminPanel extends JPanel implements ActionListener, ListSelectionL
             SignInWindow.showPanel(SignInWindow.MENU_LAYOUT);
         } else if (src == newSessionButton) {
             addNewSession();
+        } else if (src == changeSessionButton) {
+            changeSession();
         } else if (src == refreshButton) {
             refresh();
+        }
+    }
+
+    @Override
+    public void valueChanged(ListSelectionEvent e) {
+        Object src = e.getSource();
+        if (src == sessionList) {
+            SessionManager.Session newSession = sessionList.getSelectedValue();
+            if (sessionList.getSelectedValue() != null) {
+                SessionManager.changeSession(newSession);
+                repo.loadSession(newSession);
+                updateStudentList();
+                if (!sessionList.isSelectionEmpty() && !studentModel.isEmpty())
+                    studentList.setSelectedIndex(0);
+                updateTimeList();
+            }
+        } else if (src == studentList) {
+            String selected = studentList.getSelectedValue();
+            if (selected != null) updateTimeList();
         }
     }
 
@@ -183,30 +213,15 @@ public class AdminPanel extends JPanel implements ActionListener, ListSelectionL
                 return;
             }
             SessionManager.Session newSession = new SessionManager.Session(season, year);
-            System.out.println("Made new session " + newSession);
             SessionManager.changeSession(newSession);
             repo.loadSession(newSession);
 
             refresh();
 
-            LibraryUtil.showMessage("Added new session: " + newSession);
-        }
-    }
+            updateSessionLabel();
+            sessionList.setSelectedValue(newSession, true);
 
-    @Override
-    public void valueChanged(ListSelectionEvent e) {
-        Object src = e.getSource();
-        if (src == sessionList) {
-            SessionManager.Session newSession = sessionList.getSelectedValue();
-            if (sessionList.getSelectedValue() != null) {
-                SessionManager.changeSession(newSession);
-                repo.loadSession(newSession);
-                updateStudentList();
-                updateTimeList();
-            }
-        } else if (src == studentList) {
-            String selected = studentList.getSelectedValue();
-            if (selected != null) updateTimeList();
+            LibraryUtil.showMessage("Added new session: " + newSession);
         }
     }
 
@@ -267,6 +282,20 @@ public class AdminPanel extends JPanel implements ActionListener, ListSelectionL
         }
     }
 
+    /**
+     * Changes the session in which the app is configured to receive sign in/out requests from students.
+     */
+    private void changeSession() {
+        SessionManager.Session newSession = sessionList.getSelectedValue();
+        SessionManager.changeSession(newSession);
+        updateSessionLabel();
+        LibraryUtil.showMessage("Session changed to " + newSession);
+    }
+
+    private void updateSessionLabel() {
+        sessionLabel.setText("Current Session: " + SessionManager.getSession());
+    }
+
     @Override
     public void componentResized(ComponentEvent componentEvent) { }
 
@@ -275,7 +304,10 @@ public class AdminPanel extends JPanel implements ActionListener, ListSelectionL
 
     @Override
     public void componentShown(ComponentEvent componentEvent) {
+        updateSessionLabel();
         refresh();
+        if (!sessionList.isSelectionEmpty() && !studentModel.isEmpty())
+            studentList.setSelectedIndex(0);
     }
 
     @Override
