@@ -17,7 +17,10 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
- * Created by Lucent on 7/2/2017.
+ * Admin interface, enabling managing sessions, students within those sessions, viewing sign in and out times,
+ * and generating output files
+ * @author Roland Fong (rfong@princeton.edu)
+ * @author Lucent Fong (fongl@mcvts.net)
  */
 public class AdminPanel extends JPanel implements ActionListener, ListSelectionListener, ComponentListener {
 
@@ -125,7 +128,6 @@ public class AdminPanel extends JPanel implements ActionListener, ListSelectionL
     private void updateSessionList() {
         sessionModel.clear();
         SessionManager.getAvailableSessions().forEach(sessionModel::addElement);
-        sessionList.setSelectedIndex(0);
     }
 
     private void updateStudentList() {
@@ -219,7 +221,7 @@ public class AdminPanel extends JPanel implements ActionListener, ListSelectionL
             refresh();
 
             updateSessionLabel();
-            sessionList.setSelectedValue(newSession, true);
+            sessionList.setSelectedValue(SessionManager.getSession(), true);
 
             LibraryUtil.showMessage("Added new session: " + newSession);
         }
@@ -289,6 +291,7 @@ public class AdminPanel extends JPanel implements ActionListener, ListSelectionL
         SessionManager.Session newSession = sessionList.getSelectedValue();
         SessionManager.changeSession(newSession);
         updateSessionLabel();
+        sessionList.setSelectedValue(SessionManager.getSession(), true);
         LibraryUtil.showMessage("Session changed to " + newSession);
     }
 
@@ -308,6 +311,7 @@ public class AdminPanel extends JPanel implements ActionListener, ListSelectionL
         refresh();
         if (!sessionList.isSelectionEmpty() && !studentModel.isEmpty())
             studentList.setSelectedIndex(0);
+        sessionList.setSelectedValue(SessionManager.getSession(), true);
     }
 
     @Override
