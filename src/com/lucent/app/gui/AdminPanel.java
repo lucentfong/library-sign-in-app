@@ -11,7 +11,10 @@ import javax.swing.border.TitledBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -40,6 +43,7 @@ public class AdminPanel extends JPanel implements ActionListener, ListSelectionL
 
     private JButton returnButton;
     private JButton listButton;
+    private JButton reportButton;
     private JButton addButton;
     private JButton removeButton;
     private JButton newSessionButton;
@@ -99,6 +103,7 @@ public class AdminPanel extends JPanel implements ActionListener, ListSelectionL
     private JPanel createButtonPanel() {
         returnButton = new JButton("<-");
         listButton = new JButton("List Hours");
+        reportButton = new JButton("Create Student Report");
         addButton = new JButton ("Add Student");
         removeButton = new JButton("Remove Student");
         newSessionButton = new JButton("New Session");
@@ -107,6 +112,7 @@ public class AdminPanel extends JPanel implements ActionListener, ListSelectionL
 
         returnButton.addActionListener(this);
         listButton.addActionListener(this);
+        reportButton.addActionListener(this);
         addButton.addActionListener(this);
         removeButton.addActionListener(this);
         newSessionButton.addActionListener(this);
@@ -116,6 +122,7 @@ public class AdminPanel extends JPanel implements ActionListener, ListSelectionL
         JPanel buttonPanel = new JPanel();
         buttonPanel.add(returnButton);
         buttonPanel.add(listButton);
+        buttonPanel.add(reportButton);
         buttonPanel.add(addButton);
         buttonPanel.add(removeButton);
         buttonPanel.add(newSessionButton);
@@ -154,6 +161,8 @@ public class AdminPanel extends JPanel implements ActionListener, ListSelectionL
         Object src = e.getSource();
         if (src == listButton) {
             generateStudentListFile();
+        } else if (src == reportButton) {
+            generateStudentReport();
         } else if (src == addButton) {
             addStudent();
         } else if (src == removeButton) {
@@ -238,6 +247,27 @@ public class AdminPanel extends JPanel implements ActionListener, ListSelectionL
         } catch (IOException ex) {
             LibraryUtil.showError("There was an error creating " + OUT_FILE);
             ex.printStackTrace();
+        }
+    }
+
+    /**
+     * Generates a file with the session and student name for selected student.
+     */
+    private void generateStudentReport() {
+        if (!studentList.isSelectionEmpty()) {
+            String student = studentList.getSelectedValue();
+            java.util.List<Long> times = repo.getStudentTimes(student);
+            SessionManager.Session current = sessionList.getSelectedValue();
+            String filename = current.season.toString() + current.year + "-" + student + ".csv";
+            try (DataWriter writer = new DataWriter(filename)) {
+                writer.generateStudentReport(student, times);
+                LibraryUtil.showMessage("Report for " + student + " has been generated");
+            } catch (IOException e) {
+                LibraryUtil.showError("Error generating report.  Contact the developer.");
+                e.printStackTrace();
+            }
+        } else {
+            LibraryUtil.showError("Please select a student.");
         }
     }
 

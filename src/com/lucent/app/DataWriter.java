@@ -1,6 +1,7 @@
 package com.lucent.app;
 
 import java.io.*;
+import java.util.Calendar;
 import java.util.List;
 
 /**
@@ -16,6 +17,50 @@ public class DataWriter implements Closeable {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    /**
+     * Creates a report for a student's sign in/out times and total hours in csv format
+     * @param name student name
+     * @param times list of sign in/out times
+     */
+    public void generateStudentReport(String name, List<Long> times) throws IOException {
+        writer.write(",,," + name + " Volunteer Report,,,\n,\n");
+        Calendar calendar = Calendar.getInstance();
+        for (int i = 0; i < times.size(); i += 2) {
+            Long signInTime = times.get(i);
+            if (i + 1 < times.size()) {
+                Long signOutTime = times.get(i + 1);
+
+                calendar.setTimeInMillis(signInTime);
+                writer.write(",," + calendar.get(Calendar.MONTH) + "/" + calendar.get(Calendar.DATE) + ",");
+                writer.write(calendar.get(Calendar.HOUR) + ":" +
+                        calendar.get(Calendar.MINUTE) +
+                        ampmToString(calendar.get(Calendar.AM_PM)) + ",-,");
+
+                calendar.setTimeInMillis(signOutTime);
+                writer.write(calendar.get(Calendar.HOUR) + ":" +
+                        calendar.get(Calendar.MINUTE) +
+                        ampmToString(calendar.get(Calendar.AM_PM)) + ",\n");
+            }
+        }
+        writer.write(",\n");
+        LibraryUtil.HourMinute hm = LibraryUtil.convertToHour(times);
+        writer.write(",,,Total Time:," + hm.hours + "h," + hm.minutes + "m\n");
+        writer.flush();
+    }
+
+    /**
+     * Converts a Calendar.get(Calendar.AM_PM) int to string
+     * @param ampm 0 = am, 1 = pm
+     * @return string for AM or PM
+     */
+    private static String ampmToString(int ampm) {
+        switch (ampm) {
+            case 0: return "AM";
+            case 1: return "PM";
+        }
+        return "";
     }
 
     /**
